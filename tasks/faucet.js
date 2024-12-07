@@ -1,5 +1,3 @@
-import { network } from "hardhat";
-import { task } from "hardhat/config";
 import fs from "fs";
 
 // This file is only here to make interacting with the Dapp easier,
@@ -25,7 +23,7 @@ task("faucet", "Sends ETH and tokens to an address")
     }
 
     const addressJson = fs.readFileSync(addressesFile);
-    const address = JSON.parse(addressJson);
+    const address = JSON.parse(addressJson.toString());
 
     if ((await ethers.provider.getCode(address.Token)) === "0x") {
       console.error("You need to deploy your contract first");
@@ -40,7 +38,7 @@ task("faucet", "Sends ETH and tokens to an address")
 
     const tx2 = await sender.sendTransaction({
       to: receiver,
-      value: (ethers as any).WeiPerEther,
+      value: ethers.WeiPerEther,
     });
     await tx2.wait();
 

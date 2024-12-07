@@ -1,6 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-import "./tasks/faucet.ts";
+import "./tasks/faucet.js";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
