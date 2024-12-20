@@ -1,3 +1,5 @@
+import { Alert } from "@nextui-org/react";
+
 interface NetworkErrorMessageProps {
     message: string;
     dismiss: () => void;
@@ -5,17 +7,6 @@ interface NetworkErrorMessageProps {
 
 export function NetworkErrorMessage(props: NetworkErrorMessageProps) {
     return (
-        <div className="alert alert-danger" role="alert">
-            {props.message}
-            <button
-                type="button"
-                className="close"
-                data-dismiss="alert"
-                aria-label="Close"
-                onClick={props.dismiss}
-            >
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+        <Alert color="warning" title={props.message} onClose={props.dismiss}/>
     );
 }

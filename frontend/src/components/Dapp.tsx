@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
 // We'll use ethers to interact with the Ethereum network and our contract
-import { ethers,  } from "ethers";
+import { ethers } from "ethers";
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
-import TokenArtifact from "../contracts/Token.json";
+import RockPaperScissorArtifact from "../contracts/RockPaperScissor.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -62,6 +62,7 @@ export function Dapp() {
     const [transactionError, setTransactionError] = useState<any>();
     const [networkError, setNetworkError] = useState<any>();
     const [token, setToken] = useState<ethers.Contract>();
+    const [games, setGames] = useState<any[]>();
 
     function initialize(userAddress?: string) {
         // This method initializes the dapp
@@ -85,7 +86,7 @@ export function Dapp() {
         // artifact. You can do this same thing with your contracts.
         const _token = new ethers.Contract(
             contractAddress.Token,
-            TokenArtifact.abi,
+            RockPaperScissorArtifact.abi,
             provider.getSigner(0)
         );
         setToken(_token);
@@ -96,6 +97,13 @@ export function Dapp() {
         const symbol = await token?.symbol();
         const tokenData = { name, symbol };
         setTokenData(tokenData);
+    }
+
+    async function updateGames() {
+        console.log(token);
+        const games = await token?.getGameIds();
+        console.log(games);
+        setGames(games);
     }
 
     async function updateBalance() {
@@ -159,7 +167,6 @@ export function Dapp() {
 
         // First we check the network
         checkNetwork();
-
         initialize(selectedAddress);
 
         // We reinitialize it whenever the user changes their account.
@@ -217,7 +224,7 @@ export function Dapp() {
 
             // If we got here, the transaction was successful, so you may want to
             // update your state. Here, we update the user's balance.
-            await updateBalance();
+            // await updateBalance();
         } catch (error: any) {
             // We check the error code to see if this error was produced because the
             // user rejected a tx. If that's the case, we do nothing.
@@ -239,7 +246,8 @@ export function Dapp() {
     useEffect(() => {
         if (token) {
             getTokenData();
-            updateBalance();
+            // updateBalance();
+            updateGames();
         }
     }, [token]);
 
@@ -259,15 +267,15 @@ export function Dapp() {
     if (!selectedAddress) {
         return (
             <ConnectWallet 
-            connectWallet={() => connectWallet()}
-            networkError={networkError}
-            dismiss={() => dismissNetworkError()}
+                connectWallet={() => connectWallet()}
+                networkError={"eee"}
+                dismiss={() => dismissNetworkError()}
             />
         );
     }
 
     // If the token data or the user's balance hasn't loaded yet, we show
-    // a f component.
+    // a loading component.
     if (!tokenData || !balance) {
         return <Loading />;
     }
@@ -276,22 +284,14 @@ export function Dapp() {
     return (
         <div className="grid p-4">
             <div>
-                <div className="col-span-12">
-                    <h1>
-                        {tokenData.name} ({tokenData.symbol})
-                    </h1>
-                    <p>
-                    Welcome <b>{selectedAddress}</b>, you have{" "}
-                    <b>
-                        {balance.toString()} {tokenData.symbol}
-                    </b>
-                    .
-                    </p>
+                <div className="text-2xl">
+                    {tokenData.name} ({tokenData.symbol})
                 </div>
+                <p>
+                Welcome {selectedAddress}, you have{" "} {balance.toString()} {tokenData.symbol}.
+                </p>
             </div>
-
             <hr />
-
             <div>
                 <div className="col-span-12">
                     {/* 
@@ -315,7 +315,6 @@ export function Dapp() {
                     )}
                 </div>
             </div>
-
             <div>
                 <div className="col-span-12">
                     {/*
@@ -324,7 +323,6 @@ export function Dapp() {
                     {balance.eq(0) && (
                         <NoTokensMessage selectedAddress={selectedAddress} />
                     )}
-
                     {/*
                     This component displays a form that the user can use to send a 
                     transaction and transfer some tokens.

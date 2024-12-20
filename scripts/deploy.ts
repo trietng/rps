@@ -7,16 +7,16 @@ import { ethers, artifacts } from "hardhat";
 
 async function main() {
 
-    const Token = await ethers.getContractFactory("Token");
-    const token = await Token.deploy();
-    await token.waitForDeployment();
+    const RockPaperScissor = await ethers.getContractFactory("RockPaperScissor");
+    const rps = await RockPaperScissor.deploy();
+    await rps.waitForDeployment();
     
-    const address = await token.getAddress();
+    const address = await rps.getAddress();
 
     console.log("Token address:", address);
 
     // We also save the contract's artifacts and address in the frontend directory
-    saveFrontendFiles(token, address);
+    saveFrontendFiles(rps, address);
 }
 
 function saveFrontendFiles(token: any, address: string) {
@@ -31,10 +31,10 @@ function saveFrontendFiles(token: any, address: string) {
         JSON.stringify({ Token: address }, undefined, 2)
     );
 
-    const TokenArtifact = artifacts.readArtifactSync("Token");
+    const TokenArtifact = artifacts.readArtifactSync("RockPaperScissor");
 
     fs.writeFileSync(
-        path.join(contractsDir, "Token.json"),
+        path.join(contractsDir, "RockPaperScissor.json"),
         JSON.stringify(TokenArtifact, null, 2)
     );
 }

@@ -1,4 +1,5 @@
 
+import { Button } from "@nextui-org/react";
 import { NetworkErrorMessage } from "./NetworkErrorMessage";
 
 interface ConnectWalletProps {
@@ -9,27 +10,25 @@ interface ConnectWalletProps {
 
 export function ConnectWallet(props: ConnectWalletProps) {
     return (
-        <div className="container">
-            <div className="row justify-content-md-center">
-                <div className="col-12 text-center">
-                    {/* Wallet network should be set to Localhost:8545. */}
-                    {props.networkError && (
-                        <NetworkErrorMessage 
+        <div className="flex flex-col justify-center">
+            <div className="inline-flex ">
+                {/* Wallet network should be set to Localhost:8545. */}
+                {props.networkError && (
+                    <NetworkErrorMessage 
                         message={props.networkError} 
                         dismiss={props.dismiss} 
-                        />
-                    )}
-                </div>
-                    <div className="col-6 p-4 text-center">
-                    <p>Please connect to your wallet.</p>
-                    <button
-                        className="btn btn-warning"
-                        type="button"
-                        onClick={props.connectWallet}
-                    >
-                        Connect Wallet
-                    </button>
-                </div>
+                    />
+                )}
+            </div>
+            <div className="p-4 text-center">
+                <p className="mb-2">Please connect to your wallet.</p>
+                <Button
+                    color="primary"
+                    type="button"
+                    onPress={props.connectWallet}
+                >
+                    Connect Wallet
+                </Button>
             </div>
         </div>
     );
