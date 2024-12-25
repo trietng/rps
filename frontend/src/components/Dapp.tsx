@@ -13,11 +13,11 @@ import contractAddress from "../contracts/contract-address.json";
 // logic. They just render HTML.
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
-import { Loading } from "./Loading";
 import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
+import { CircularProgress } from "@nextui-org/react";
 
 declare global {
     interface Window {
@@ -268,7 +268,7 @@ export function Dapp() {
         return (
             <ConnectWallet 
                 connectWallet={() => connectWallet()}
-                networkError={"eee"}
+                networkError={networkError}
                 dismiss={() => dismissNetworkError()}
             />
         );
@@ -276,68 +276,46 @@ export function Dapp() {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!tokenData || !balance) {
-        return <Loading />;
+    if (!tokenData) {
+        return (
+            <div className="min-h-screen flex flex-col justify-center items-center">
+                <CircularProgress aria-label="Loading..." size="lg"/>
+            </div>
+        );
     }
 
     // If everything is loaded, we render the application.
     return (
-        <div className="grid p-4">
+        <div className="flex p-4">
             <div>
                 <div className="text-2xl">
                     {tokenData.name} ({tokenData.symbol})
                 </div>
                 <p>
-                Welcome {selectedAddress}, you have{" "} {balance.toString()} {tokenData.symbol}.
+                Welcome {selectedAddress}.
                 </p>
             </div>
             <hr />
             <div>
-                <div className="col-span-12">
-                    {/* 
-                    Sending a transaction isn't an immediate action. You have to wait
-                    for it to be mined.
-                    If we are waiting for one, we show a message here.
-                    */}
-                    {txBeingSent && (
-                        <WaitingForTransactionMessage txHash={txBeingSent} />
-                    )}
+                {/* 
+                Sending a transaction isn't an immediate action. You have to wait
+                for it to be mined.
+                If we are waiting for one, we show a message here.
+                */}
+                {txBeingSent && (
+                    <WaitingForTransactionMessage txHash={txBeingSent} />
+                )}
 
-                    {/* 
-                    Sending a transaction can fail in multiple ways. 
-                    If that happened, we show a message here.
-                    */}
-                    {transactionError && (
-                        <TransactionErrorMessage
-                            message={getRpcErrorMessage(transactionError)}
-                            dismiss={() => dismissTransactionError()}
-                        />
-                    )}
-                </div>
-            </div>
-            <div>
-                <div className="col-span-12">
-                    {/*
-                    If the user has no tokens, we don't show the Transfer form
-                    */}
-                    {balance.eq(0) && (
-                        <NoTokensMessage selectedAddress={selectedAddress} />
-                    )}
-                    {/*
-                    This component displays a form that the user can use to send a 
-                    transaction and transfer some tokens.
-                    The component doesn't have logic, it just calls the transferTokens
-                    callback.
-                    */}
-                    {balance.gt(0) && (
-                        <Transfer
-                            transferTokens={(to: any, amount: any) =>
-                                transferTokens(to, amount)
-                            }
-                            tokenSymbol={tokenData.symbol}
-                        />
-                    )}
-                </div>
+                {/* 
+                Sending a transaction can fail in multiple ways. 
+                If that happened, we show a message here.
+                */}
+                {transactionError && (
+                    <TransactionErrorMessage
+                        message={getRpcErrorMessage(transactionError)}
+                        dismiss={() => dismissTransactionError()}
+                    />
+                )}
             </div>
         </div>
     );

@@ -10,8 +10,8 @@ interface ConnectWalletProps {
 
 export function ConnectWallet(props: ConnectWalletProps) {
     return (
-        <div className="flex flex-col justify-center">
-            <div className="inline-flex ">
+        <div className="flex flex-col justify-center mt-4">
+            <div className="flex justify-center">
                 {/* Wallet network should be set to Localhost:8545. */}
                 {props.networkError && (
                     <NetworkErrorMessage 

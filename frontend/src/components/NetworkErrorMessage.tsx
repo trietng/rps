@@ -7,6 +7,8 @@ interface NetworkErrorMessageProps {
 
 export function NetworkErrorMessage(props: NetworkErrorMessageProps) {
     return (
-        <Alert color="warning" title={props.message} onClose={props.dismiss}/>
+        <div className="w-1/3">     
+            <Alert color="warning" title={props.message} onClose={props.dismiss}/>
+        </div>
     );
 }

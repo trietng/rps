@@ -1,3 +1,5 @@
+import { Alert } from "@nextui-org/react";
+
 interface TransactionErrorMessageProps {
     message: string;
     dismiss: () => void;
@@ -5,17 +7,8 @@ interface TransactionErrorMessageProps {
 
 export function TransactionErrorMessage(props: TransactionErrorMessageProps) {
     return (
-        <div className="alert alert-danger" role="alert">
-            Error sending transaction: {props.message.substring(0, 100)}
-            <button
-                type="button"
-                className="close"
-                data-dismiss="alert"
-                aria-label="Close"
-                onClick={props.dismiss}
-            >
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div className="w-1/3">     
+            <Alert color="warning" title={props.message} onClose={props.dismiss}/>
         </div>
     );
 }
