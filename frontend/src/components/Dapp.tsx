@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 // We'll use ethers to interact with the Ethereum network and our contract
 import { ethers } from "ethers";
 
+// Components
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CircularProgress, useDisclosure, RadioGroup, getKeyValue, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { LuMountain, LuPlus, LuScissors, LuScroll, LuSend, LuUserRoundPlus, LuX } from "react-icons/lu";
+
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
 import RockPaperScissorArtifact from "../contracts/RockPaperScissor.json";
@@ -13,11 +17,11 @@ import contractAddress from "../contracts/contract-address.json";
 // logic. They just render HTML.
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
-import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
-import { NoTokensMessage } from "./NoTokensMessage";
-import { CircularProgress } from "@nextui-org/react";
+import { HR } from "./ui/hr";
+import { CustomRadio } from "./ui/custom/radio";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 declare global {
     interface Window {
@@ -42,27 +46,55 @@ const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 // you how to keep your Dapp and contract's state in sync,  and how to send a
 // transaction.
 
-interface DappState {
-    tokenData?: {
-        name: string;
-        symbol: string;
-    };
-    selectedAddress?: string;
-    balance?: any;
-    txBeingSent?: any;
-    transactionError?: any;
-    networkError?: any;
+const attackStringValues = {
+    "rock": "1",
+    "paper": "2",
+    "scissors": "3"
 }
+
+const columns = [
+    { key: 'id', label: 'ID' },
+    { key: 'player1', label: 'Player 1' },
+    { key: 'player2', label: 'Player 2' },
+    { key: 'winner', label: 'Winner' },
+    // { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action' }
+]
+
+type GameAction = "create" | "join";
 
 export function Dapp() {
     const [tokenData, setTokenData] = useState<{ name: string; symbol: string }>();
     const [selectedAddress, setSelectedAddress] = useState<string>();
-    const [balance, setBalance] = useState<any>();
     const [txBeingSent, setTxBeingSent] = useState<any>();
     const [transactionError, setTransactionError] = useState<any>();
     const [networkError, setNetworkError] = useState<any>();
     const [token, setToken] = useState<ethers.Contract>();
-    const [games, setGames] = useState<any[]>();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const [gameAction, setGameAction] = useState<GameAction>("create");
+    const [selectedAttack, setSelectedAttack] = useState<number>(1);
+    const [selectedGameId, setSelectedGameId] = useState<number>(0);
+    const newGameMutation = useMutation({
+        mutationFn: async () => await token?.newGame(selectedAttack),
+        onSettled: async (data) => console.log(data)
+    })
+    const joinGameMutation = useMutation({
+        mutationFn: async () => await token?.joinGame(selectedGameId, selectedAttack),
+        onSettled: async (data) => console.log(data)
+    })
+    const games = useQuery({
+        queryKey: ['games'],
+        queryFn: async () => (await token?.getGames()) || [],
+        select: (data: any[][]) => data[1].map(({ player1, player2, player1Attack, player2Attack, winner, status }, index) => {
+            const id = data[0][index];
+            return { id, player1, player2, player1Attack, player2Attack, winner, status }
+        }),
+        refetchInterval: 1000
+    })
+
+    useEffect(() => {
+        console.log(games.data)
+    }, [games.data]);
 
     function initialize(userAddress?: string) {
         // This method initializes the dapp
@@ -99,22 +131,10 @@ export function Dapp() {
         setTokenData(tokenData);
     }
 
-    async function updateGames() {
-        console.log(token);
-        const games = await token?.getGameIds();
-        console.log(games);
-        setGames(games);
-    }
-
-    async function updateBalance() {
-        setBalance(await token?.balanceOf(selectedAddress));
-    }
-
     // This method resets the state
     function resetState() {
         setTokenData(undefined);
         setSelectedAddress(undefined);
-        setBalance(undefined);
         setTxBeingSent(undefined);
         setTransactionError(undefined);
         setNetworkError(undefined);
@@ -243,11 +263,24 @@ export function Dapp() {
         }
     }
 
+    function onSubmitNewGame(action: GameAction) {
+        if (action === "create") {
+            newGameMutation.mutate();
+        } else {
+            joinGameMutation.mutate();
+        }
+        onOpenChange();
+    }
+
+    function onCommitGameAction(action: GameAction) {
+        setGameAction(action);
+        onOpen();
+    }
+
     useEffect(() => {
         if (token) {
             getTokenData();
             // updateBalance();
-            updateGames();
         }
     }, [token]);
 
@@ -286,7 +319,7 @@ export function Dapp() {
 
     // If everything is loaded, we render the application.
     return (
-        <div className="flex p-4">
+        <div className="flex flex-col p-4">
             <div>
                 <div className="text-2xl">
                     {tokenData.name} ({tokenData.symbol})
@@ -295,7 +328,7 @@ export function Dapp() {
                 Welcome {selectedAddress}.
                 </p>
             </div>
-            <hr />
+            <HR />
             <div>
                 {/* 
                 Sending a transaction isn't an immediate action. You have to wait
@@ -316,6 +349,76 @@ export function Dapp() {
                         dismiss={() => dismissTransactionError()}
                     />
                 )}
+            </div>
+            <div>
+                <Button onPress={() => onCommitGameAction("create")}><LuPlus/> New Game</Button>
+                <Modal isOpen={isOpen} onClose={onOpenChange} size="lg">
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-col gap-1">{gameAction === "create" ? "Create New Game" : "Join Game"}</ModalHeader>
+                                <ModalBody>
+                                <RadioGroup label="Attack" orientation="horizontal" onValueChange={(value) => setSelectedAttack(Number(value))} defaultValue={attackStringValues.rock}>
+                                    <CustomRadio value={attackStringValues.rock}>
+                                        <LuMountain className="inline"/> Rock
+                                    </CustomRadio>
+                                    <CustomRadio value={attackStringValues.paper}>
+                                        <LuScroll className="inline"/> Paper
+                                    </CustomRadio>
+                                    <CustomRadio value={attackStringValues.scissors}>
+                                        <LuScissors className="inline"/> Scissors
+                                    </CustomRadio>
+                                </RadioGroup>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="danger" variant="light" onPress={onClose}>
+                                        <LuX className="inline"/> Close
+                                    </Button>
+                                    <Button color="primary" onPress={() => onSubmitNewGame(gameAction)}>
+                                        <LuSend className="inline"/> Submit
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+                <Table aria-label="Table of all games" className="mt-4">
+                    <TableHeader columns={columns}>
+                        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                    </TableHeader>
+                    <TableBody items={games.data || []}>
+                        {(item: any) => (
+                            <TableRow key={item.id.toNumber()}>
+                                {(columnKey) => {
+                                    if (columnKey === 'id') {
+                                        return (
+                                            <TableCell key={columnKey}>{item.id.toNumber()}</TableCell>
+                                        );
+                                    } else if (columnKey === 'action') {
+                                        return (
+                                            <TableCell key={columnKey}>
+                                                {item.status === true || item.player1.toString().toLowerCase() === selectedAddress.toLowerCase() ?
+                                                "N/A" :
+                                                <Button 
+                                                    color="primary"
+                                                    onPress={() => {
+                                                        setSelectedGameId(item.id.toNumber());
+                                                        onCommitGameAction("join")
+                                                    }}
+                                                ><LuUserRoundPlus className="inline"/> Join</Button>}
+                                            </TableCell>
+                                        );
+                                    }
+                                    const value = getKeyValue(item, columnKey);
+                                    if (Number(value) === 0) {
+                                        return (<TableCell key={columnKey}>N/A</TableCell>);
+                                    }
+                                    return (<TableCell key={columnKey}>{value.toString()}</TableCell>);
+                                }}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
         </div>
     );

@@ -1,20 +1,23 @@
+import { Link } from "@nextui-org/react";
+
 export function NoWalletDetected() {
     return (
-        <div className="flex justify-center w-full">
+        <div className="min-h-screen  flex flex-col justify-center items-center ">
             <p>
-                No Ethereum wallet was detected. <br />
+                No Ethereum wallet was detected.
+            </p>
+            <p>
                 Please install{" "}
-                <a
+                <Link
                     href="https://www.coinbase.com/wallet"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
                     Coinbase Wallet
-                </a>
-                {" "}
-                <a href="http://metamask.io" target="_blank" rel="noopener noreferrer">
+                </Link> or {" "}
+                <Link href="http://metamask.io" target="_blank" rel="noopener noreferrer">
                     MetaMask
-                </a>.
+                </Link>.
             </p>
         </div>
     );
