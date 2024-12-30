@@ -48,8 +48,19 @@ contract RockPaperScissor {
         game.player2 = msg.sender;
         game.player2Attack = attack;
         // DEBUG: Judge the game
-        judge(gameId);
+        // judge(gameId);
         emit GameReady(gameId, game.player1, game.player2, game.player1Attack, game.player2Attack);
+    }
+
+
+    function submitResult(uint256 gameId, address winner) public {
+        Game storage game = games[gameId];
+        require(game.status == false, "Result already submitted");
+        require(game.player1 != address(0), "Game does not exist");
+        require(game.player2 != address(0), "Game is not full");
+
+        game.winner = winner;
+        game.status = true;
     }
 
     function judge(uint256 gameId) public {

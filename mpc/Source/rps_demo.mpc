@@ -1,4 +1,3 @@
-# Rock-Paper-Scissors in MP-SPDZ (fewer equality checks).
 # Moves: 1 = Rock, 2 = Paper, 3 = Scissors
 #
 # Outline:
@@ -8,22 +7,15 @@
 #   shifted == 2   => tie
 #   shifted in {0,3} => p0 wins
 #   shifted in {1,4} => p1 wins
-#
-# This avoids modulo 3 (which isn't supported in MP-SPDZ 0.4.0)
-# and uses fewer secure equality checks than enumerating each pair.
 
 from Compiler.types import sint
 
 def main():
-    # 1) Read inputs from the two parties
     p0_choice = sint.get_input_from(0)
     p1_choice = sint.get_input_from(1)
 
-    # 2) Compute diff in [-2..2], then shift to [0..4]
     diff = p0_choice - p1_choice
     shifted = diff + 2
-
-    # 3) Determine tie, p0_wins, p1_wins with fewer .equal() calls
 
     # tie => shifted == 2
     is_tie = shifted.equal(2)
@@ -36,13 +28,12 @@ def main():
     # p1_wins => shifted == 1 or shifted == 4
     p1_wins = shifted.equal(1) + shifted.equal(4)
 
-    # 4) Combine into final result
     #    0 => Tie, 1 => P0 wins, 2 => P1 wins
     result = is_tie * 0 + p0_wins * 1 + p1_wins * 2
 
-    # 5) Reveal the moves and final outcome
-    print_ln("Party 0 choice (1=Rock,2=Paper,3=Scissors): %s", p0_choice.reveal())
-    print_ln("Party 1 choice (1=Rock,2=Paper,3=Scissors): %s", p1_choice.reveal())
-    print_ln("Outcome -> 0:Tie, 1:Party0 wins, 2:Party1 wins => %s", result.reveal())
+    # print_ln("Party 0 choice (1=Rock,2=Paper,3=Scissors): %s", p0_choice.reveal())
+    # print_ln("Party 1 choice (1=Rock,2=Paper,3=Scissors): %s", p1_choice.reveal())
+    # print_ln("Outcome -> 0:Tie, 1:Party0 wins, 2:Party1 wins => %s", result.reveal())
+    print_ln("%s", result.reveal())
 
 main()
