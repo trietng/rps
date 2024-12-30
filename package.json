@@ -9,7 +9,9 @@
   "scripts": {
     "sync:frontend": "cd frontend && npm install",
     "sync": "npm install && npm run sync:frontend",
-    "deploy": "hardhat run scripts/deploy.ts --network localhost"
+    "deploy": "hardhat run scripts/deploy.ts --network localhost",
+    "backend": "python backend/main.py",
+    "frontend": "cd frontend && npm run dev"
   },
   "keywords": [],
   "author": "",
