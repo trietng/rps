@@ -1,10 +1,10 @@
 import asyncio
 from blockchain_listener import BlockchainListener
 
-
-URL = 'http://localhost:8545'
+async def main():
+    mq = asyncio.Queue()
+    listener = BlockchainListener('http://localhost:8545', './backend/contracts', mq)
+    await listener.listen()
 
 if __name__ == '__main__':
-    listener = BlockchainListener(URL, './backend/contracts')
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(listener.listen())
+    asyncio.run(main())
