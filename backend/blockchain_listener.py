@@ -5,7 +5,8 @@ import os
 
 
 class BlockchainListener:
-    def __init__(self, url: str, contracts_path: str):
+    def __init__(self, url: str, contracts_path: str, message_queue: asyncio.Queue):
+        self.mq = message_queue
         self.w3 = AsyncWeb3(AsyncHTTPProvider(url))
         with open(f'{contracts_path}/contract-address.json') as ca:
             contract_address = json.load(ca)
@@ -104,7 +105,7 @@ class BlockchainListener:
         print("Listening for GameJoined events...")
         while True:
             for event in await filter.get_new_entries():
-                print(event)
+                # self.mq.put_nowait(event['args'])
                 await self.handle_event(event)
             await asyncio.sleep(0)
             
