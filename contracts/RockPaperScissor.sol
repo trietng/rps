@@ -11,6 +11,14 @@ contract RockPaperScissor {
         bool status;
     }
 
+    event GameReady(
+        uint256 gameId,
+        address player1,
+        address player2,
+        uint8 player1Attack,
+        uint8 player2Attack
+    );
+
     // Game name, symbol and owner
     string public name = "Rock Paper Scissor";
     string public symbol = "RPS";
@@ -41,6 +49,7 @@ contract RockPaperScissor {
         game.player2Attack = attack;
         // DEBUG: Judge the game
         judge(gameId);
+        emit GameReady(gameId, game.player1, game.player2, game.player1Attack, game.player2Attack);
     }
 
     function judge(uint256 gameId) public {

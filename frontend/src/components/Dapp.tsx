@@ -9,7 +9,7 @@ import { LuMountain, LuPlus, LuScissors, LuScroll, LuSend, LuUserRoundPlus, LuX 
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
-import RockPaperScissorArtifact from "../contracts/RockPaperScissor.json";
+import RockPaperScissorArtifact from "../contracts/rock-paper-scissor.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -117,7 +117,7 @@ export function Dapp() {
         // Then, we initialize the contract using that provider and the token's
         // artifact. You can do this same thing with your contracts.
         const _token = new ethers.Contract(
-            contractAddress.Token,
+            contractAddress.token,
             RockPaperScissorArtifact.abi,
             provider.getSigner(0)
         );
@@ -261,7 +261,7 @@ export function Dapp() {
             // this part of the state.
             setTxBeingSent(undefined);
         }
-    }
+    } 
 
     function onSubmitNewGame(action: GameAction) {
         if (action === "create") {

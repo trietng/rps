@@ -6,7 +6,6 @@ import fs from "fs";
 import { ethers, artifacts } from "hardhat";
 
 async function main() {
-
     const RockPaperScissor = await ethers.getContractFactory("RockPaperScissor");
     const rps = await RockPaperScissor.deploy();
     await rps.waitForDeployment();
@@ -15,27 +14,42 @@ async function main() {
 
     console.log("Token address:", address);
 
-    // We also save the contract's artifacts and address in the frontend directory
-    saveFrontendFiles(rps, address);
+    saveContractFiles(address);
 }
 
-function saveFrontendFiles(token: any, address: string) {
-    const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+function saveContractFiles(address: string) {
+    const frontendDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+    const backendDir = path.join(__dirname, "..", "backend", "contracts");
 
-    if (!fs.existsSync(contractsDir)) {
-        fs.mkdirSync(contractsDir);
+    if (!fs.existsSync(frontendDir)) {
+        fs.mkdirSync(frontendDir);
+    }
+
+    if (!fs.existsSync(backendDir)) {
+        fs.mkdirSync(backendDir);
     }
 
     fs.writeFileSync(
-        path.join(contractsDir, "contract-address.json"),
-        JSON.stringify({ Token: address }, undefined, 2)
+        path.join(frontendDir, "contract-address.json"),
+        JSON.stringify({ token: address }, undefined, 2)
     );
 
     const TokenArtifact = artifacts.readArtifactSync("RockPaperScissor");
 
     fs.writeFileSync(
-        path.join(contractsDir, "RockPaperScissor.json"),
+        path.join(frontendDir, "rock-paper-scissor.json"),
         JSON.stringify(TokenArtifact, null, 2)
+    );
+
+    // Copy the contracts from frontend to backend
+    fs.copyFileSync(
+        path.join(frontendDir, "contract-address.json"),
+        path.join(backendDir, "contract-address.json")
+    );
+
+    fs.copyFileSync(
+        path.join(frontendDir, "rock-paper-scissor.json"),
+        path.join(backendDir, "rock-paper-scissor.json")
     );
 }
 

@@ -8,7 +8,8 @@
   },
   "scripts": {
     "sync:frontend": "cd frontend && npm install",
-    "sync": "npm install && npm run sync:frontend"
+    "sync": "npm install && npm run sync:frontend",
+    "deploy": "hardhat run scripts/deploy.ts --network localhost"
   },
   "keywords": [],
   "author": "",
