@@ -7,8 +7,13 @@ import { ethers, artifacts } from "hardhat";
 
 async function main() {
     const RockPaperScissor = await ethers.getContractFactory("RockPaperScissor");
+    const InputMaskManager = await ethers.getContractFactory("InputMaskManager"); 
     const rps = await RockPaperScissor.deploy();
     await rps.waitForDeployment();
+
+    // Deploy the InputMaskManager contract with an argument uint256 count
+    const imm = await InputMaskManager.deploy(5);
+    await imm.waitForDeployment(); 
     
     const address = await rps.getAddress();
 
