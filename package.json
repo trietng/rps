@@ -7,11 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "sync:frontend": "cd client && npm install",
-    "sync": "npm install && npm run sync:frontend",
+    "sync:client": "cd client/gui && npm install",
+    "sync": "npm install && npm run sync:client",
+    "build:client": "cd client/gui && npm run build",
     "deploy": "hardhat run scripts/deploy.ts --network localhost",
-    "backend": "python server/main.py",
-    "frontend": "cd server && npm run dev"
+    "server": "python server/main.py",
+    "client": "python client/main.py"
   },
   "keywords": [],
   "author": "",

@@ -1,2 +1,2 @@
 web3
-fastapi[standard]
+pywebview[qt]

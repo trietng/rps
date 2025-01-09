@@ -1,38 +1,31 @@
-# Sample React Dapp
+# Rock Paper Scissor DApp
 
-This directory has a sample Dapp to interact with your contracts, built using
-React.
+## Dependencies
 
-## Running the Dapp
+### Linux packages
 
-This project uses [`create-react-app`](https://create-react-app.dev/), so most
-configuration files are handled by it.
+Assuming you are using a Debian/Ubuntu-based distribution:
 
-To run it, you just need to execute `npm start` in a terminal, and open
-[http://localhost:3000](http://localhost:3000).
+```bash
+sudo apt-get install libgl1-mesa-dev libxdamage1 libnss3 libxkbcommon-x11-0 libasound2 libxcb-xinerama0 libxcb-icccm4 libxcb-keysyms1 libxcb-xkb1
+```
 
-To learn more about what `create-react-app` offers, you can read
-[its documentation](https://create-react-app.dev/docs/getting-started).
+### Python packages
 
-## Architecture of the Dapp
+```bash
+pip install pywebview[qt]
+```
 
-This Dapp consists of multiple React Components, which you can find in
-`src/components`.
+## Run the client
 
-Most of them are presentational components, have no logic, and just render HTML.
+First, build the app using the following command:
 
-The core functionality is implemented in `src/components/Dapp.js`, which has
-examples of how to connect to the user's wallet, initialize your Ethereum
-connection and contracts, read from the contract's state, and send transactions.
+```bash
+cd gui && npm run build
+```
 
-You can use the `Dapp` component as a starting point for your project. It has
-comments explaining each part of its code, and indicating what's specific to
-this project, and what can be reused.
+This will create a folder name `dist`. Note that the current setup only produces production-mode file, so no debugging (yet).
 
-## Getting help and news
-
-If you need help with this project or with Hardhat in general, please read [this guide](https://hardhat.org/hardhat-runner/docs/guides/getting-help) to learn where and how to get it.
-
-[Follow us on Twitter](https://twitter.com/HardhatHQ) to get the latest news about Hardhat, and don't forget to star [our GitHub repository](https://github.com/NomicFoundation/hardhat)!
-
-**Happy _building_!**
+```bash
+python main.py
+```
